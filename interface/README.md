@@ -1,4 +1,4 @@
-# Tracky
+# Tracky [Demo](https://tracky-flame.vercel.app/)
 
 _Take command of your life_
 
@@ -41,5 +41,4 @@ Some other Features are
 - `aptos move compile`
 - `aptos move publish`
 
-
-While deploying keep in mind about the addresses that has to be used 
+While deploying keep in mind about the addresses that has to be used
