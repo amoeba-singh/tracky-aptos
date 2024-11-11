@@ -22,7 +22,6 @@ const WalletConnect = ({ session }) => {
     // Initial check
     checkConnection();
     if (walletObj.address) {
-      fetchPoints(walletObj.address).then((points) => setPoints(points));
       setWalletConnected(true);
     }
   }, [session?.user?.id, walletObj]);
@@ -55,9 +54,7 @@ const WalletConnect = ({ session }) => {
           setWalletConnected(true);
           return;
         }
-        handleInitialize(response.address, session?.user?.id).then((points) =>
-          setPoints(points)
-        );
+        await handleInitialize(response.address, session?.user?.id);
         dispatch(setWalletAddress(response.address));
         setWalletConnected(true);
       } else {
@@ -127,8 +124,19 @@ const WalletConnect = ({ session }) => {
                 setPoints(points)
               );
             }}
+            className="my-2"
           >
             {points} 🪙
+            <span
+              className="btn p-2 border rounded-md "
+              onClick={() => {
+                fetchPoints(walletObj.address).then((points) =>
+                  setPoints(points)
+                );
+              }}
+            >
+              Reload
+            </span>
           </p>
         </div>
       )}
