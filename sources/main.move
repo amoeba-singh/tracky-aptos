@@ -1,53 +1,41 @@
-module MyModule::TaskReward {
-
-    use aptos_framework::signer;
-    use aptos_framework::event;
+module user_points_v3::user_points_v3 {
     use std::vector;
-
-    // Structure to store user's task completion data
-    struct UserTasks has store, key {
-        owner: address,        // User's address
-        already_participated: bool,  // Flag to check if the engaged in other challenge
+    use std::signer;
+    
+    struct UserInfo has key {
+        mongodb_id: vector<u8>,
+        points: u64
     }
 
-    // Structure to store reward token balance for each user
-    struct RewardToken has store, key {
-        balance: u64,  // Reward balance of the user
-    }
-
-    // Function to mint reward tokens (called when all tasks are completed)
-    public fun mint_reward_token(owner: &signer, amount: u64) acquires RewardToken {
-        let owner_address = signer::address_of(owner);
-        let reward_token = borrow_global_mut<RewardToken>(owner_address); // Borrow the user's reward token balance
-        reward_token.balance = reward_token.balance + amount; // Add the minted tokens
-    }
-
-    // Function to create a new user tasks entry (initially 0 tasks completed)
-    public fun create_user(owner: &signer) acquires UserTasks {
-        let owner_address = signer::address_of(owner);
-        let user_tasks = borrow_global_mut<UserTasks>(owner_address);
-
-        // assert!(user_tasks.already_participated == false, 1);
+    public entry fun initialize_user(
+        account: &signer,
+        mongodb_id: vector<u8>
+    ) {
+        let user_addr = signer::address_of(account);
+        assert!(!exists<UserInfo>(user_addr), 1);
         
-
-        let user_tasks = UserTasks {
-            owner: owner_address,
-            already_participated: true,
-        };
-        move_to(owner, user_tasks); // Move the user tasks record to the user's account
-
-        // Create the user's reward token entry with 0 balance
-        let reward_token = RewardToken {
-            balance: 0,
-        };
-        move_to(owner, reward_token); // Move the reward token record to the user's account
+        move_to(account, UserInfo {
+            mongodb_id,
+            points: 0
+        });
     }
 
+    public entry fun increase_points(account: &signer, amount: u64) acquires UserInfo {
+        let user_addr = signer::address_of(account);
+        let user_info = borrow_global_mut<UserInfo>(user_addr);
+        user_info.points = user_info.points + amount;
+    }
 
-    // Function to reset the user's tasks and reward status (can be used for a new challenge)
-    // public fun reset_user(owner: &signer) acquires UserTasks {
-    //     let owner_address = signer::address_of(owner);
-    //     let user_tasks = borrow_global_mut<UserTasks>(owner_address); // Borrow the user's task record
-    //     user_tasks.already_participated = false; // Reset reward flag
-    // }
+    public entry fun decrease_points(account: &signer, amount: u64) acquires UserInfo {
+        let user_addr = signer::address_of(account);
+        let user_info = borrow_global_mut<UserInfo>(user_addr);
+        assert!(user_info.points >= amount, 1);
+        user_info.points = user_info.points - amount;
+    }
+
+    #[view]
+    public fun get_user_info(addr: address): (vector<u8>, u64) acquires UserInfo {
+        let user_info = borrow_global<UserInfo>(addr);
+        (user_info.mongodb_id, user_info.points)
+    }
 }

@@ -1,15 +1,10 @@
 [package]
-name = "send_message"
+name = "user_points_v3"
 version = "1.0.0"
 authors = []
 
 [addresses]
-MyModule = MyWalletAddress
-[dev-addresses]
+user_points_v3  = 'Wallet Address'
 
-[dependencies.AptosFramework]
-git = "https://github.com/aptos-labs/aptos-core.git"
-rev = "testnet"
-subdir = "aptos-move/framework/aptos-framework"
-
-[dev-dependencies]
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git",subdir = "aptos-move/framework/aptos-framework",rev = "testnet"}
