@@ -38,7 +38,8 @@ const handleInitialize = async (walletAddress, user_id) => {
     const transaction = await window.aptos
       .signAndSubmitTransaction(payload)
       .catch((error) => {
-        if (error.code === 4001) {
+        console.log(error);
+        if (error.code === 4002) {
           toast.error("Transaction rejected by user");
           return null;
         }
@@ -47,10 +48,10 @@ const handleInitialize = async (walletAddress, user_id) => {
 
     if (!transaction) return -1;
     await client.waitForTransaction(transaction.hash);
-    const points = await fetchPoints(walletAddress);
+    // const points = await fetchPoints(walletAddress);
     // await createPoints(user_id, points);
     toast.success("User initialized successfully!");
-    return points;
+    // return points;
   } catch (error) {
     console.error("Failed to initialize user:", error);
     toast.error("Failed to initialize user");
